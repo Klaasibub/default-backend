@@ -1,0 +1,27 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres:13-alpine
+    # volumes:
+    #   - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    image: helloworld
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: uvicorn --host 0.0.0.0 --port 8080 --workers 4 helloworld.asgi:application
+    expose:
+      - 8080
+    depends_on:
+      - db
+  nginx:
+    build: ./nginx
+    ports:
+      - "1337:80"
+    depends_on:
+      - web
